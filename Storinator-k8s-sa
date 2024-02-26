@@ -1,0 +1,28 @@
+Annotate sa in kubernetes to access bucket by enabling workload identity
+
+https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+
+
+
+kubectl create namespace bucket-token
+
+kubectl create serviceaccount bucket-token-access \
+    --namespace bucket-token
+
+gcloud iam service-accounts add-iam-policy-binding import-export-sa@workspaces-preview.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:workspaces-preview.svc.id.goog[bucket-token/bucket-token-access]"
+
+
+kubectl annotate serviceaccount bucket-token-access \
+    --namespace bucket-token \
+    iam.gke.io/gcp-service-account=import-export-sa@workspaces-preview.iam.gserviceaccount.com
+
+-------------Curl Commands-------------
+
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/email
+
+curl -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token
+
+
+curl -H "Authorization: Bearer ya29.c.c0AY_VpZhfMv1qMh5QD27ZS3lNjSIs-tItI54cRyaxWxXLXZ_4-zDUjApZa91iOUqbZH5XvpBi1yjwdcG3AK6kZ1jiwzoYlamgprLuU6nFsOx2SY1YDmeJ5K7K9TIxrMsgiPNF1eCk6Goi_ukt-xh8AFwfBdmWYKvdE64tJbaJSjX8bqu-AoFHF3JLtQ49s215vPV_p8F7JHxqSTDdBr_OEkhuohwMXxGqRtTgx5tFohYM_cUxyqKLV-QZ7ddBGhE9EH2_oN-bdSRPRVNqrOshqUVO6RxkmOfOqirTn7js3bGDhxC7zky3SD4opFvA_NukTqlHLofmI9ZUf0SgoQlG0p1qdCVmd_hHzTKe3ZznVmZM14KKLsglVz5zecoJKykyz_xlO7ELmzgEtyIL9hFLRb7WRnj1e2MzIjIQmij7JScrQMtNhmLVhzT7zf6o0zozSQFJVe0qjNwdbuejqB6IICMP92dI6bQQiIBAPNG06gmsvR4Zog57YHe1-frCnO2Uy2WTAUANeENrRlc2uufFuMgM3PmikgpKKwhkLdi2776kHEW0tKESmsnMXwRagbbZb_KXZKCd36K5YFaE4R_vxgM3q4L5ROQdmygbIedOzbDwJZUsTXVHMsqQpwL643POUSsZ4adSmVwSS0MSt3FUQiwmRvz8ZBR-6RYg2ymchehRi5eR165gf24VU1B8__Jj2v5gXF70jn3FBndRdev8FYny3a9nFqr7Wfpwehkw9i7YlMh60_03donfy8JqYxm42SxlFw6_BavdgS00suo6JoFf7r0lwvzw00Vs7xV6RVnhd54Rq8i36XXSf9rR-9WrhqMcofJ-bWjMmd_cjwsm-YMmJn7XaRV4Wn9pI5XruWjz7pfjqMqdwlV8sjhhwIuu867YZa_9mudzfg9gqoWln3ZqWnyrymBoavobJVZxwIldajuiJb56qSIXdgceyZVZxI8x1l5eabSligzbw6RldUBafv9Fwq7FudkY8dc29710dxuR_k3tsu2" https://storage.googleapis.com/storage/v1/b/backup-ws-bucket/o
