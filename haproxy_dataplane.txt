@@ -1,0 +1,11 @@
+Steps to follow- 
+1. Take a backup of the current haproxy
+2. cd /dataplaneapis/used
+3. Run start transaction 
+4. Run add default backend
+5. Run add backend 
+6. Run add server 
+7. Check the present in location /tmp/haproxy  (match the commit id in the file)
+8. Check the filediff between the new file and the old configuration file 
+9. Commit the transaction
+
