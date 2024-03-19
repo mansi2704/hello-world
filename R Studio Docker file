@@ -1,0 +1,54 @@
+RUN dnf -y update \
+    && dnf -y upgrade \
+    && dnf install -y libXcomposite mesa-libGL 
+
+RUN sudo dnf install -y libXdamage
+RUN dnf install libXtst
+RUN dnf install alsa-lib
+ set QT_DEBUG_PLUGINS=1
+  export QT_QPA_PLATFORM=offscreen
+   export LD_LIBRARY_PATH=/home/os-pkgs/usr/lib64/:$LD_LIBRARY_PATH
+
+   wget https://download2.rstudio.org/server/centos7/x86_64/rstudio-server-rhel-2023.12.1-402-x86_64.rpm
+
+   sudo yum install rstudio-server-rhel-2023.12.1-402-x86_64.rpm
+
+
+   yum install compat-openssl10
+
+   rstudio-server start
+   rstudio-server verify-installation
+    RSTUDIO_WHICH_R=$(which R) 
+
+
+------------------------------------------------------------------------
+
+FROM rockylinux/rockylinux:8
+
+# Install necessary dependencies
+RUN yum -y update && \
+    yum -y install wget sudo libstdc++
+
+# Download and install R
+RUN yum -y install epel-release && \
+    yum -y install R
+
+# Install RStudio Server
+RUN wget https://download2.rstudio.org/server/centos8/x86_64/rstudio-server-rhel-1.4.1106-x86_64.rpm && \
+    yum -y install rstudio-server-rhel-1.4.1106-x86_64.rpm && \
+    rm rstudio-server-rhel-1.4.1106-x86_64.rpm
+
+# Create the server data directory with correct permissions
+RUN mkdir -p /var/run/rstudio-server && \
+    chmod 777 /var/run/rstudio-server && \
+    chmod +t /var/run/rstudio-server && \
+    mkdir -p /var/lib/rstudio-server && \
+    chmod 777 /var/lib/rstudio-server
+
+# Expose port 8787
+EXPOSE 8787
+
+# Start RStudio Server
+CMD ["/usr/lib/rstudio-server/bin/rserver"]
+ /home/os-pkgs/usr/lib/rstudio-server/bin/rserver
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/provisionerToolkit/bin:/usr/local/cuda/bin:/opt/conda/bin
